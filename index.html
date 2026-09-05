@@ -110,8 +110,10 @@
     height:118px;border-radius:14px;
     display:flex;align-items:center;justify-content:center;
     background:var(--tag-soft, var(--surface-2));
+    overflow:hidden;
   }
   .card .art svg{width:56px;height:56px;color:var(--tag, var(--ink-soft));}
+  .card .art img{width:100%;height:100%;object-fit:cover;display:block;}
   .card .tag{
     align-self:flex-start;
     font-size:11.5px;font-weight:700;letter-spacing:.02em;
@@ -301,7 +303,9 @@ const ICONS = {
   sports: '<circle cx="5.5" cy="18.5" r="2"/><circle cx="18.5" cy="18.5" r="2"/><path d="M5.5 18.5H12l2-8h4"/><path d="M13.5 10.5h3.5a2 2 0 0 1 2 2"/><path d="M16.5 4.5l2.5 2.5-4.5 4.5"/>',
   plane: '<path d="M3 11l18-8-8 18-2-8-8-2z"/>',
   rubik: '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/>',
-  rock: '<path d="M4 16c0-3 2-5 3.5-6.5C9 8 10 5 13 4c1 2 .5 3.5 2 4.5 2 1.3 5 3 5 7.5a6 6 0 0 1-6 6H9a5 5 0 0 1-5-6z"/>'
+  rock: '<path d="M4 16c0-3 2-5 3.5-6.5C9 8 10 5 13 4c1 2 .5 3.5 2 4.5 2 1.3 5 3 5 7.5a6 6 0 0 1-6 6H9a5 5 0 0 1-5-6z"/>',
+  cards: '<rect x="3" y="6" width="12" height="15" rx="2" transform="rotate(-8 9 13.5)"/><rect x="9" y="4" width="12" height="15" rx="2"/><circle cx="15" cy="8.5" r="1.3"/>',
+  bags: '<path d="M6 8h12l-1.2 12.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>'
 };
 
 // بيانات المنتجات (603 صنف، 18 مجموعة) متحمّلة من ملف products.js
@@ -342,7 +346,7 @@ function renderGrid(){
     return `
     <div class="card">
       <div class="art" style="--tag:var(${catInfo.color});--tag-soft:var(${catInfo.soft})">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[p.icon]}</svg>
+        ${p.img ? `<img src="${escapeHtml(p.img)}" alt="${escapeHtml(p.name)}" loading="lazy">` : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[p.icon]}</svg>`}
       </div>
       <span class="tag" style="--tag:var(${catInfo.color});--tag-soft:var(${catInfo.soft})">${escapeHtml(catInfo.name)}</span>
       <h3>${escapeHtml(p.name)}</h3>
