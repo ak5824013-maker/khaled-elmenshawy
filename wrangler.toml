@@ -1,7 +1,7 @@
 name = "khaled-elmenshawy"
-main = "worker.js"
-compatibility_date = "2024-09-23"
+main = "index.js"
+compatibility_date = "2023-01-01"
 
-[assets]
-directory = "./"
-binding = "ASSETS"
+[[kv_namespaces]]
+binding = "PRODUCTS_KV"
+id = "هنحط_هنا_رقم_ال_KV_بتاعتك"
