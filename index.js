@@ -4,7 +4,6 @@ export default {
     const TELEGRAM_TOKEN = env.TELEGRAM_TOKEN || '8868963824:AAHagJo8ZpkEaz_VGbW4UjSsl9Fy61J5s2s';
     const CHAT_ID = env.CHAT_ID || '-1003223801317';
 
-    // 1. استقبال المنتجات من تليجرام (تلقائي بالاسم والكود والسعر ودمج الصور)
     if (url.pathname === '/webhook' && request.method === 'POST') {
       try {
         const update = await request.json();
@@ -78,24 +77,21 @@ export default {
       }
     }
 
-    // 2. استقبال الفاتورة من العميل وإرسالها لتليجرام
     if (url.pathname === '/checkout' && request.method === 'POST') {
       try {
         const orderData = await request.json();
         const { customerName, customerPhone, customerAddress, items } = orderData;
 
-        let orderText = `🚨 طلب عيادة/عميل جديد!\n\n`;
+        let orderText = `🚨 طلب جديد من الموقع!\n\n`;
         orderText += `👤 الاسم: ${customerName}\n`;
         orderText += `📞 التليفون: ${customerPhone}\n`;
         orderText += `📍 العنوان: ${customerAddress}\n\n`;
         orderText += `🛒 الأصناف المطلوبة:\n`;
 
-        let total = 0;
         items.forEach((item, index) => {
           orderText += `${index + 1}. ${item.title} (الكمية: ${item.qty})\n`;
         });
 
-        // إرسال الفاتورة لجروب تليجرام الإدارة
         await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -111,7 +107,6 @@ export default {
       }
     }
 
-    // 3. واجهة الموقع المطورة (بحث، كروت، سلة طلبات، فواتير)
     if (url.pathname === '/') {
         let productsArray = [];
         if (env.PRODUCTS_KV) {
@@ -145,12 +140,8 @@ export default {
                 .product-card p { white-space: pre-wrap; line-height: 1.5; font-size: 13px; font-weight: bold; margin: 0 0 12px 0; }
                 .btn-add { background: #27ae60; color: #fff; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
                 .btn-add:hover { background: #219653; }
-                
-                /* شريط السلة العائم */
                 .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #2c3e50; color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.2); z-index: 1000; }
                 .cart-bar button { background: #e74c3c; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; }
-                
-                /* نافذة إتمام الطلب (Modal) */
                 .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 2000; }
                 .modal-content { background: #fff; padding: 25px; border-radius: 10px; width: 90%; max-width: 450px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
                 .modal-content h2 { margin-top: 0; font-size: 20px; color: #2c3e50; }
@@ -161,7 +152,7 @@ export default {
         </head>
         <body>
             <header>
-                <h1>مؤسسة خالد المنشاوي للألعاب</h1>
+                <h1>مؤسسة خالد المنشاوي</h1>
                 <p>قائمة الأصناف المتاحة للطلب الفوري</p>
             </header>
             
@@ -174,32 +165,29 @@ export default {
                         if (product.imageUrls && product.imageUrls.length > 0) {
                             imagesHtml = '<div class="image-gallery">';
                             product.imageUrls.forEach(img => {
-                                imagesHtml += \`<img src="\${img}" alt="product">\`;
+                                imagesHtml += `<img src="${img}" alt="product">`;
                             });
                             imagesHtml += '</div>';
                         }
-                        // استخراج أول سطر كعنوان للصنف
-                        let titleLine = product.text.split('\\n')[0] || 'منتج';
-                        return \`
-                        <div class="product-card" data-title="\${product.text.toLowerCase()}">
+                        let titleLine = product.text.split('\n')[0] || 'منتج';
+                        return `
+                        <div class="product-card" data-title="${product.text.toLowerCase()}">
                             <div>
-                                \${imagesHtml}
-                                <p>\${product.text.replace(/\\n/g, '<br>')}</p>
+                                ${imagesHtml}
+                                <p>${product.text.replace(/\n/g, '<br>')}</p>
                             </div>
-                            <button class="btn-add" onclick="addToCart('\${titleLine.replace(/'/g, "")}')">إضافة للسلة 🛒</button>
+                            <button class="btn-add" onclick="addToCart('${titleLine.replace(/'/g, "")}')">إضافة للسلة 🛒</button>
                         </div>
-                        \`;
+                        `;
                     }).join('') || '<p style="text-align:center; grid-column: 1/-1;">لا توجد منتجات معروضة حالياً.</p>'}
                 </main>
             </div>
 
-            <!-- شريط السلة السفلي -->
             <div class="cart-bar" id="cartBar" style="display:none;">
                 <span id="cartCount">تم اختيار 0 صنف</span>
                 <button onclick="openCheckoutModal()">إتمام الطلب وعمل الفاتورة 📋</button>
             </div>
 
-            <!-- نافذة بيانات العميل -->
             <div class="modal" id="checkoutModal">
                 <div class="modal-content">
                     <h2>تأكيد الطلب</h2>
@@ -225,7 +213,7 @@ export default {
                     const cartCount = document.getElementById('cartCount');
                     if (cart.length > 0) {
                         cartBar.style.display = 'flex';
-                        cartCount.innerText = \`تم اختيار \${cart.length} صنف في السلة\`;
+                        cartCount.innerText = 'تم اختيار ' + cart.length + ' صنف في السلة';
                     } else {
                         cartBar.style.display = 'none';
                     }
